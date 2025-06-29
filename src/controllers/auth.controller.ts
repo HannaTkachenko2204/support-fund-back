@@ -37,3 +37,42 @@ export const registerController: RequestHandler = async (req, res, next) => {
     next(err);
   }
 };
+
+export const loginController: RequestHandler = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      res.status(400).json({ message: 'All fields are required' });
+      return;
+    }
+
+    const userResult = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+
+    if (userResult.rows.length === 0) {
+      res.status(401).json({ message: 'Invalid credentials' });
+      return;
+    }
+
+    const user = userResult.rows[0];
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      res.status(401).json({ message: 'Invalid credentials' });
+      return;
+    }
+
+    const token = jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET as string,
+      { expiresIn: '7d' }
+    );
+
+    // Не передаємо пароль на фронт
+    delete user.password;
+
+    res.json({ user, token });
+  } catch (err) {
+    next(err);
+  }
+};
