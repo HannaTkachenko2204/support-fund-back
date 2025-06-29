@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const pool = new Pool({
+export const db = new Pool({
   host: process.env.PGHOST,
   port: Number(process.env.PGPORT),
   user: process.env.PGUSER,
@@ -11,12 +11,10 @@ const pool = new Pool({
   database: process.env.PGDATABASE,
 });
 
-pool.connect()
+db.connect()
   .then(() => {
     console.log('✅ Connected to PostgreSQL database');
   })
   .catch((err: Error) => {
     console.error('❌ Error connecting to the database:', err);
   });
-
-export default pool;
