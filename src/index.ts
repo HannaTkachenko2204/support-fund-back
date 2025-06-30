@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: ['https://support-fund-front.vercel.app'],
+  origin: ['http://localhost:5173', 'https://support-fund-front.vercel.app'],
   credentials: true,
 }));
 app.use(express.json());

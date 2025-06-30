@@ -1,3 +1,4 @@
+import { User } from "../../types/user.types";
 import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import { db } from '../../db';
@@ -16,7 +17,7 @@ export const refreshTokenController: RequestHandler = async (req, res) => {
   try {
     const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as { id: number };
 
-    const result = await db.query('SELECT * FROM users WHERE id = $1', [decoded.id]);
+    const result = await db.query<User>('SELECT * FROM users WHERE id = $1', [decoded.id]);
     const user = result.rows[0];
 
     if (!user || user.refresh_token !== refreshToken) {
@@ -27,7 +28,7 @@ export const refreshTokenController: RequestHandler = async (req, res) => {
     const newAccessToken = generateAccessToken({ id: user.id });
     const newRefreshToken = generateRefreshToken({ id: user.id });
 
-    await db.query('UPDATE users SET refresh_token = $1 WHERE id = $2', [newRefreshToken, user.id]);
+    await db.query<User>('UPDATE users SET refresh_token = $1 WHERE id = $2', [newRefreshToken, user.id]);
 
     res
       .cookie('refreshToken', newRefreshToken, {

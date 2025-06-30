@@ -1,3 +1,4 @@
+import { User } from "../../types/user.types";
 import { Request, Response } from 'express';
 import { db } from '../../db';
 
@@ -12,7 +13,7 @@ export const currentController = async (req: AuthRequest, res: Response): Promis
     return;
   }
 
-  const result = await db.query(
+  const result = await db.query<User>(
     'SELECT id, name, email, created_at FROM users WHERE id = $1',
     [userId]
   );
@@ -22,5 +23,6 @@ export const currentController = async (req: AuthRequest, res: Response): Promis
     return;
   }
 
-  res.json({ user: result.rows[0] });
+  const user: User = result.rows[0];
+  res.json({ user });
 };
