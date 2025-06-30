@@ -13,8 +13,12 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors({
   origin: ['http://localhost:5173', 'https://support-fund-front.vercel.app'],
-  credentials: true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200,
 }));
+// app.options('*', cors());
 app.use(express.json());
 app.use(cookieParser());
 
