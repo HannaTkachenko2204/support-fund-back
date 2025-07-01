@@ -1,5 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
+import nodemailer from 'nodemailer';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
@@ -19,4 +21,32 @@ export const hashPassword = async (password: string): Promise<string> => {
 
 export const comparePassword = async (password: string, hashedPassword: string): Promise<boolean> => {
   return await bcrypt.compare(password, hashedPassword);
+};
+
+export const generateResetToken = () => uuidv4();
+
+type SendEmailProps = {
+  to: string;
+  subject: string;
+  text: string;
+};
+export const sendEmail = async ({ to, subject, text }: SendEmailProps) => {
+  // Створюємо транспорт для SMTP (наприклад, Brevo)
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT) || 587,  
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASSWORD, 
+    },
+  });
+
+  // Відправляємо лист
+  await transporter.sendMail({
+    from: `"Support Fund" <${process.env.SMTP_USER}>`,
+    to,
+    subject,
+    text,
+  });
 };
