@@ -29,8 +29,9 @@ type SendEmailProps = {
   to: string;
   subject: string;
   text: string;
+  html?: string;
 };
-export const sendEmail = async ({ to, subject, text }: SendEmailProps) => {
+export const sendEmail = async ({ to, subject, text, html }: SendEmailProps) => {
   // Створюємо транспорт для SMTP (наприклад, Brevo)
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -42,11 +43,17 @@ export const sendEmail = async ({ to, subject, text }: SendEmailProps) => {
     },
   });
 
-  // Відправляємо лист
-  await transporter.sendMail({
-    from: `"Support Fund" <${process.env.SMTP_USER}>`,
-    to,
-    subject,
-    text,
-  });
+  try {
+    const info = await transporter.sendMail({
+      from: process.env.SMTP_FROM,
+      to,
+      subject,
+      text,
+      html,
+    });
+    console.log('Email sent:', info.messageId);
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error;
+  }
 };

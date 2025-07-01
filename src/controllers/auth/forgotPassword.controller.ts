@@ -26,6 +26,7 @@ export const forgotPasswordController: RequestHandler = async (req, res, next) =
       to: email,
       subject: 'Відновлення паролю',
       text: `Перейдіть за посиланням, щоб скинути пароль: https://support-fund-front.vercel.app/reset-password?token=${resetToken}`,
+      html: `<p>Перейдіть за посиланням, щоб скинути пароль: <a href="https://support-fund-front.vercel.app/reset-password?token=${resetToken}">Відновити пароль</a></p>`
     });
 
     res.json({ message: 'Лист для відновлення паролю надіслано' });
